@@ -229,7 +229,7 @@ public class KplMessageHandler extends AbstractAwsMessageHandler<Void> implement
 	 * @see UserRecord#setSchema(Schema)
 	 */
 	public void setGlueSchema(Schema glueSchema) {
-		setPartitionKeyExpression(new ValueExpression<>(glueSchema));
+		setGlueSchemaExpression(new ValueExpression<>(glueSchema));
 	}
 
 	/**

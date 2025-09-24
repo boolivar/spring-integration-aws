@@ -18,6 +18,7 @@ package org.springframework.integration.aws.outbound;
 
 import com.amazonaws.services.kinesis.producer.KinesisProducer;
 import com.amazonaws.services.kinesis.producer.UserRecord;
+import com.amazonaws.services.schemaregistry.common.Schema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -59,6 +60,9 @@ import static org.mockito.Mockito.verify;
 public class KplMessageHandlerTests {
 
 	@Autowired
+	protected Schema schema;
+
+	@Autowired
 	protected KinesisProducer kinesisProducer;
 
 	@Autowired
@@ -89,6 +93,7 @@ public class KplMessageHandlerTests {
 		assertThat(userRecord.getStreamName()).isEqualTo("someStream");
 		assertThat(userRecord.getPartitionKey()).isEqualTo("somePartitionKey");
 		assertThat(userRecord.getExplicitHashKey()).isNull();
+		assertThat(userRecord.getSchema()).isSameAs(this.schema);
 	}
 
 	@Test
@@ -116,6 +121,7 @@ public class KplMessageHandlerTests {
 		assertThat(userRecord.getStreamName()).isEqualTo("someStream");
 		assertThat(userRecord.getPartitionKey()).isEqualTo("somePartitionKey");
 		assertThat(userRecord.getExplicitHashKey()).isNull();
+		assertThat(userRecord.getSchema()).isSameAs(this.schema);
 	}
 
 	@Test
@@ -174,9 +180,14 @@ public class KplMessageHandlerTests {
 			KplMessageHandler kplMessageHandler = new KplMessageHandler(kinesisProducer);
 			kplMessageHandler.setAsync(true);
 			kplMessageHandler.setStream("someStream");
+			kplMessageHandler.setGlueSchema(schema());
 			return kplMessageHandler;
 		}
 
+		@Bean
+		public Schema schema() {
+			return new Schema("syntax=\"proto2\";", "PROTOBUF", "testschema");
+		}
 	}
 
 }
